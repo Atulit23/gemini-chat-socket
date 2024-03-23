@@ -12,6 +12,9 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: "http://localhost:3000",
+    origin: "http://localhost:3000/chat",
+    origin: "https://gemini-frontend-smoky.vercel.app",
+    origin: "https://gemini-frontend-smoky.vercel.app/chat",
   },
 });
 
