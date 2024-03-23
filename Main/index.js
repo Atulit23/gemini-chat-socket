@@ -31,8 +31,7 @@ app.use(cors(corsOptions));
 io.on("connection", (socket) => {
   console.log("client connected: ", socket.id);
 
-  const userRoom = `room-${socket.id}`;
-  socket.join(userRoom);
+  socket.join("chat-room");
 
   socket.on("disconnect", (reason) => {
     console.log(reason);
@@ -59,10 +58,18 @@ io.on("connection", (socket) => {
       const chunkText = chunk.text();
       console.log(chunkText);
       const response = `${chunkText}`;
-      io.to(userRoom).emit("response", response);
+      io.to("chat-room").emit("response", response);
     }
+
+    // const response = await result.response;
+    // const text = response.text();
+
+    // console.log(text);
+    // res.send({gen_response: text})
+
   });
 });
+
 setInterval(() => {
   io.to("clock-room").emit("time", new Date());
 }, 1000);
