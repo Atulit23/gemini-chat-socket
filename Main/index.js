@@ -11,7 +11,11 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://gemini-frontend-smoky.vercel.app", "https://gemini-frontend-smoky.vercel.app/chat"]
+    origin: [
+      "http://localhost:3000",
+      "https://gemini-frontend-smoky.vercel.app",
+      "https://gemini-frontend-smoky.vercel.app/chat",
+    ],
   },
 });
 
@@ -21,21 +25,30 @@ const PORT = 8001;
 
 app.use(express.json());
 
-const corsOptions ={
-  origin: ["http://localhost:3000", "https://gemini-frontend-smoky.vercel.app", "https://gemini-frontend-smoky.vercel.app/chat"], 
-    credentials:true,           
-    optionSuccessStatus:200
-}
+const corsOptions = {
+  origin: [
+    "http://localhost:3000",
+    "https://gemini-frontend-smoky.vercel.app",
+    "https://gemini-frontend-smoky.vercel.app/chat",
+  ],
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
 app.use(cors(corsOptions));
 
 io.on("connection", (socket) => {
   console.log("client connected: ", socket.id);
-
-  socket.join("chat-room");
+  const roomId = socket.id
 
   socket.on("disconnect", (reason) => {
     console.log(reason);
   });
+  socket.join('roomId');
+
+  // socket.on("joinRoom", (room) => {
+  //   console.log(room)
+  // });
 
   socket.on("message", async (data) => {
     console.log("Received message from client:", data);
@@ -58,7 +71,8 @@ io.on("connection", (socket) => {
       const chunkText = chunk.text();
       console.log(chunkText);
       const response = `${chunkText}`;
-      io.to("chat-room").emit("response", response);
+      console.log(roomId)
+      io.to('roomId').emit("response", response);
     }
 
     // const response = await result.response;
@@ -66,13 +80,8 @@ io.on("connection", (socket) => {
 
     // console.log(text);
     // res.send({gen_response: text})
-
   });
 });
-
-setInterval(() => {
-  io.to("clock-room").emit("time", new Date());
-}, 1000);
 
 server.listen(PORT, (err) => {
   if (err) console.log(err);
